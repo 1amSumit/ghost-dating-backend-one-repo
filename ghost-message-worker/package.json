@@ -1,0 +1,17 @@
+{
+  "name": "ghost_backend_worker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -b && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "kafkajs": "^2.2.4",
+    "prisma": "^6.9.0"
+  }
+}

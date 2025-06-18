@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "app/generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+  last_seen  DateTime?
+
+  user_details UserDetail?
+  preferences  UserPreferences?
+  media        Media?
+
+  liked_users Liked[] @relation("UserGotLiked")
+  given_likes Liked[] @relation("UserGivenLike")
+
+  matches1 Matches[] @relation("UserMatches1")
+  matches2 Matches[] @relation("UserMatches2")
+
+  message_from_user Message[] @relation("message_from_user")
+  message_to_user   Message[] @relation("message_to_user")
+}
+
+model Matches {
+  id            String    @id @default(uuid())
+  user1_id      String
+  user2_id      String
+  is_matched_at DateTime
+  is_blocked    Boolean
+  unmatched_at  DateTime?
+
+  user1 User @relation("UserMatches1", fields: [user1_id], references: [id])
+  user2 User @relation("UserMatches2", fields: [user2_id], references: [id])
+
+  @@unique([user1_id, user2_id])
+}
+
+model UserDetail {
+  id                   String   @id @default(uuid())
+  first_name           String
+  last_name            String
+  pronounce            String[]
+  gender               String
+  date_of_birth        DateTime
+  age                  String
+  bio                  String
+  height               String
+  education            String
+  location             String
+  latitude             Float?
+  longitude            Float?
+  last_active          DateTime
+  profile_pic          String
+  howyoudie            String
+  sexuality            String
+  interested_in_gender String
+  user_id              String   @unique
+  user                 User     @relation(fields: [user_id], references: [id])
+}
+
+model UserPreferences {
+  id               String   @id @default(uuid())
+  intensions       String[]
+  prefered_min_age Int?
+  prefered_max_age Int?
+  max_distance     Int?
+  show_on_feed     Boolean
+  is_ghost_mode    Boolean
+  verified         Boolean
+  user_id          String   @unique
+  user             User     @relation(fields: [user_id], references: [id])
+}
+
+model Media {
+  id      String   @id @default(uuid())
+  gallery String[]
+  user_id String   @unique
+  user    User     @relation(fields: [user_id], references: [id])
+}
+
+model Liked {
+  id          String @id @default(uuid())
+  liked_to_id String
+  liked_by_id String
+
+  liked_to User @relation("UserGotLiked", fields: [liked_to_id], references: [id])
+  liked_by User @relation("UserGivenLike", fields: [liked_by_id], references: [id])
+
+  @@unique([liked_to_id, liked_by_id])
+}
+
+model Message {
+  id                String   @id @default(uuid())
+  message           String
+  message_from_user String
+  message_to_user   String
+  created_at        DateTime
+
+  from_user User @relation("message_from_user", fields: [message_from_user], references: [id])
+  to_user   User @relation("message_to_user", fields: [message_to_user], references: [id])
+}
