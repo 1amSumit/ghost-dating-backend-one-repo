@@ -15,6 +15,12 @@ app.use("/api/v1/liked", likedUser);
 app.use("/api/v1/match", matchRoutes);
 app.use("/api/v1/message", messageRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    message: "Server is up and running",
+  });
+});
+
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
