@@ -1,5 +1,7 @@
 import express from "express";
 import "dotenv/config";
+import helmet from "helmet";
+
 import { userRoutes } from "./routes/user";
 import { feedRoutes } from "./routes/feed";
 import { likedUser } from "./routes/liked";
@@ -8,6 +10,8 @@ import { messageRouter } from "./routes/message";
 
 const app = express();
 app.use(express.json());
+
+app.use(helmet());
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/feed", feedRoutes);
