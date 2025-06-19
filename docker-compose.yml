@@ -35,8 +35,10 @@ services:
   kafka:
     image: apache/kafka:4.0.0
     ports:
+      - "9093:9093"
       - "9092:9092"
     environment:
+      KAFKA_KRAFT_MODE: "true"
       KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: DOCKER://kafka:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
@@ -58,6 +60,20 @@ services:
       timeout: 10s
       retries: 5
       start_period: 1s
+
+  ghost-message-init:
+    image: apache/kafka:4.0.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["sh", "-c"]
+    command: >
+      "/opt/kafka/bin/kafka-topics.sh
+      --create
+      --bootstrap-server kafka:9093
+      --topic ghost-message-events
+      --partitions 1
+      --replication-factor 1 || true"
 
   ghost-primary-backend:
     build: ./ghost-primary-backend
