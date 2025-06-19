@@ -6,7 +6,10 @@ import { generateUSerID } from "./utils/genRoomId";
 
 const kafka = new Kafka({
   clientId: "ghost-date",
-  brokers: ["localhost:9092"],
+  brokers: ["kafka:9093"],
+  retry: {
+    retries: 10,
+  },
 });
 
 const KAFKA_TOPIC = "ghost-message-events";
@@ -24,6 +27,7 @@ const chatRooms = new Map<WebSocket, string>();
 wss.on("connection", async (ws, req) => {
   console.log("client connected to websocket");
   await producer.connect();
+  await new Promise((res) => setTimeout(res, 2000));
 
   ws.on("message", async (message) => {
     const data = JSON.parse(message.toString());
@@ -63,6 +67,15 @@ wss.on("connection", async (ws, req) => {
 
 const PORT = 8080;
 
-server.listen(PORT, () => {
-  console.log(`websocker server is running on port ${PORT}`);
+app.get("/health", async (req, res) => {
+  try {
+    await producer.connect();
+    res.status(200).send("OK");
+  } catch (err) {
+    res.status(500).send("Kafka producer not connected");
+  }
+});
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`websocket server is running on port ${PORT}`);
 });

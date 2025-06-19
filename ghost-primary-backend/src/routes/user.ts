@@ -201,6 +201,7 @@ routes.post(
       let profilePicUrl = "";
       //@ts-ignore
       const profilePicFile = files["profile-pic"]?.[0];
+      console.log(profilePicFile);
       if (profilePicFile) {
         const profilePicName = `${Date.now()}-${profilePicFile.originalname}`;
         await minioClient.fPutObject(
@@ -213,7 +214,7 @@ routes.post(
         );
         profilePicUrl = `http://192.168.1.3:9000/${bucketName}/${profilePicName}`;
       }
-
+      console.log(profilePicUrl);
       await prismaClient.$transaction(async (tx) => {
         await tx.userDetail.create({
           data: {
@@ -350,12 +351,14 @@ routes.put("/update-user", upload.any(), authMiddleware, async (req, res) => {
 
   let profilePicUrl = "";
   if (profileFile) {
+    console.log(profileFile);
     const profilePicName = `${Date.now()}-${profileFile.originalname}`;
     await minioClient.fPutObject(bucketName, profilePicName, profileFile.path, {
       "Content-Type": "image/jpeg",
     });
     profilePicUrl = `http://192.168.1.3:9000/${bucketName}/${profilePicName}`;
   }
+  console.log(profilePicUrl);
 
   if (data.firstName !== undefined) userDetailData.first_name = data.firstName;
   if (data.lastName !== undefined) userDetailData.last_name = data.lastName;

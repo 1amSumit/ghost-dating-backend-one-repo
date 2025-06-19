@@ -2,7 +2,7 @@ import { Kafka } from "kafkajs";
 import { PrismaClient } from "../prisma/app/generated/prisma/client";
 const kafka = new Kafka({
   clientId: "ghost-date",
-  brokers: ["localhost:9092"],
+  brokers: ["kafka:9093"],
 });
 
 const KAFKA_TOPIC = "ghost-message-events";
@@ -11,6 +11,7 @@ const prismaClient = new PrismaClient();
 
 async function main() {
   const consumer = kafka.consumer({ groupId: "ghost-group" });
+
   await consumer.connect();
 
   await consumer.subscribe({ topic: KAFKA_TOPIC, fromBeginning: true });

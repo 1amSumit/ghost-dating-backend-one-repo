@@ -19,7 +19,7 @@ const kafkajs_1 = require("kafkajs");
 const genRoomId_1 = require("./utils/genRoomId");
 const kafka = new kafkajs_1.Kafka({
     clientId: "ghost-date",
-    brokers: ["localhost:9092"],
+    brokers: ["kafka:9092"],
 });
 const KAFKA_TOPIC = "ghost-message-events";
 const producer = kafka.producer();
@@ -62,6 +62,11 @@ wss.on("connection", (ws, req) => __awaiter(void 0, void 0, void 0, function* ()
     }));
 }));
 const PORT = 8080;
-server.listen(PORT, () => {
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        message: "server is up and running",
+    });
+});
+server.listen(PORT, "0.0.0.0", () => {
     console.log(`websocker server is running on port ${PORT}`);
 });

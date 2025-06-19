@@ -2,6 +2,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+
+RUN apk --no-cache add curl
+
 COPY package* .
 
 RUN npm install
