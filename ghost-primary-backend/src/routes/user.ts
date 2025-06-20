@@ -194,7 +194,7 @@ routes.post(
         await minioClient.fPutObject(bucketName, fileName, file.path, {
           "Content-Type": "image/jpeg",
         });
-        const publicUrl = `https://minio.ghost.sumitjha.site/${bucketName}/${fileName}`;
+        const publicUrl = `http://192.168.1.3:9000/${bucketName}/${fileName}`;
         urls.push(publicUrl);
       }
 
@@ -212,7 +212,7 @@ routes.post(
             "Content-Type": "image/jpeg",
           }
         );
-        profilePicUrl = `https://minio.ghost.sumitjha.site/${bucketName}/${profilePicName}`;
+        profilePicUrl = `http://192.168.1.3:9000/${bucketName}/${profilePicName}`;
       }
       console.log(profilePicUrl);
       await prismaClient.$transaction(async (tx) => {
@@ -356,7 +356,7 @@ routes.put("/update-user", upload.any(), authMiddleware, async (req, res) => {
     await minioClient.fPutObject(bucketName, profilePicName, profileFile.path, {
       "Content-Type": "image/jpeg",
     });
-    profilePicUrl = `https://minio.ghost.sumitjha.site/${bucketName}/${profilePicName}`;
+    profilePicUrl = `http://192.168.1.3:9000/${bucketName}/${profilePicName}`;
   }
   console.log(profilePicUrl);
 

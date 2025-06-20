@@ -58,10 +58,10 @@ async function abhirajLike() {
 
 async function run() {
   try {
-    // for (let i = 0; i < 20; i++) {
-    //   await main();
-    // }
-    await abhirajLike();
+    for (let i = 0; i < 20; i++) {
+      await main();
+    }
+    // await abhirajLike();
   } catch (err) {
     console.error("Error:", err);
   } finally {

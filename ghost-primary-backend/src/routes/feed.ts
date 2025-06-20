@@ -23,6 +23,14 @@ router.get("/getUnMatchedFeed/:page", async (req, res) => {
     },
   });
 
+  const likedUsers = await prismaClient.liked.findMany({
+    where: {
+      liked_to_id: loggedInUser,
+    },
+    select: { liked_by: true },
+  });
+  const likedUserIds = likedUsers.map((entry) => entry.liked_by.id);
+
   const interestsInGender = user?.user_details?.interested_in_gender;
 
   const usersPerPage = 10;
@@ -32,7 +40,7 @@ router.get("/getUnMatchedFeed/:page", async (req, res) => {
   const getAllUser = await prismaClient.user.findMany({
     where: {
       id: {
-        notIn: [loggedInUser, ...seenUsers],
+        notIn: [loggedInUser, ...seenUsers, ...likedUserIds],
       },
       user_details: {
         is: {

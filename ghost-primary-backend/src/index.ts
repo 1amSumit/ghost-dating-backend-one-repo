@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import helmet from "helmet";
+import morgan from "morgan";
 
 import { userRoutes } from "./routes/user";
 import { feedRoutes } from "./routes/feed";
@@ -9,9 +10,10 @@ import { matchRoutes } from "./routes/match";
 import { messageRouter } from "./routes/message";
 
 const app = express();
-app.use(express.json());
 
 app.use(helmet());
+app.use(morgan("dev"));
+app.use(express.json());
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/feed", feedRoutes);
@@ -26,7 +28,6 @@ app.get("/health", (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
