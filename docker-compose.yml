@@ -88,6 +88,7 @@ services:
       DATABASE_URL: postgresql://postgres:mysecretpassword@postgres:5432/postgres
       REDIS_URL: redis://redis:6379
       KAFKA_BROKER: kafka:9092
+      PORT: 3000
 
   ghost-message-service:
     build: ./ghost-message-service
