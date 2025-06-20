@@ -109,6 +109,8 @@ services:
         condition: service_healthy
       ghost-message-service:
         condition: service_healthy
+      ghost-message-init:
+        condition: service_completed_successfully
 
 volumes:
   ghostdbb:
