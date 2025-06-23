@@ -11,36 +11,48 @@ router.use(authMiddleware);
 router.get("/getUnMatchedFeed/:page", async (req, res) => {
   //@ts-ignore
   const loggedInUser = req.userId;
-
   const page = req.params.page ? parseInt(req.params.page as string) : 1;
-
-  const user = await prismaClient.user.findFirst({
-    where: {
-      id: loggedInUser,
-    },
-    include: {
-      user_details: true,
-    },
-  });
-
-  const likedUsers = await prismaClient.liked.findMany({
-    where: {
-      liked_to_id: loggedInUser,
-    },
-    select: { liked_by: true },
-  });
-  const likedUserIds = likedUsers.map((entry) => entry.liked_by.id);
-
-  const interestsInGender = user?.user_details?.interested_in_gender;
-
   const usersPerPage = 10;
 
-  const seenUsers = await redisClient.sMembers(`seen:${loggedInUser}`);
+  const [user, likedUsers, alreadyMatched, seenUsers] = await Promise.all([
+    prismaClient.user.findFirst({
+      where: { id: loggedInUser },
+      include: { user_details: true },
+    }),
+    prismaClient.liked.findMany({
+      where: { liked_to_id: loggedInUser },
+      select: { liked_by: true },
+    }),
+    prismaClient.matches.findMany({
+      where: {
+        OR: [{ user1_id: loggedInUser }, { user2_id: loggedInUser }],
+      },
+      include: {
+        user1: { include: { user_details: true } },
+        user2: { include: { user_details: true } },
+      },
+    }),
+    redisClient.sMembers(`seen:${loggedInUser}`),
+  ]);
+
+  const matchedUserFilter = alreadyMatched.map((match) =>
+    match.user1_id === loggedInUser ? match.user2.id : match.user1.id
+  );
+
+  const likedUserIds = likedUsers.map((entry) => entry.liked_by.id);
+  const interestsInGender = user?.user_details?.interested_in_gender;
+
+  const excludeUserIds = new Set([
+    loggedInUser,
+    ...seenUsers,
+    ...matchedUserFilter,
+    ...likedUserIds,
+  ]);
 
   const getAllUser = await prismaClient.user.findMany({
     where: {
       id: {
-        notIn: [loggedInUser, ...seenUsers, ...likedUserIds],
+        notIn: Array.from(excludeUserIds),
       },
       user_details: {
         is: {

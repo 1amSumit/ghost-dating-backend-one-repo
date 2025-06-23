@@ -1,4 +1,5 @@
 import { PrismaClient } from "../../prisma/app/generated/prisma/client";
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -30,6 +31,8 @@ async function main() {
     //   },
     // },
   });
+
+  await prisma.message.deleteMany({});
 
   await prisma.matches.deleteMany({});
 

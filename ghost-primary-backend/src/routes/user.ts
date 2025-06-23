@@ -32,7 +32,13 @@ routes.post("/signup", async (req, res) => {
     return;
   }
 
-  const exists = await redisClient.get(parsedData.data.email);
+  const exists =
+    (await redisClient.get(parsedData.data.email)) ||
+    (await prismaClient.user.findFirst({
+      where: {
+        email: parsedData.data.email,
+      },
+    }));
 
   if (exists !== null) {
     res.status(411).json({
@@ -167,6 +173,8 @@ routes.post(
     const parsedData = userDetailsTypes.safeParse(body);
     const files = req.files;
 
+    console.log(parsedData.data?.userId);
+
     if (!parsedData.success) {
       res.status(411).json({
         message: "Incorrect input",
@@ -285,7 +293,23 @@ routes.post(
         message: "user created successfully",
       });
     } catch (err) {
+      console.log(err);
+
+      try {
+        await prismaClient.user.delete({
+          where: {
+            id: parsedData.data.userId,
+          },
+        });
+      } catch (deleteError) {
+        console.error(
+          "Failed to delete user after creation error:",
+          deleteError
+        );
+      }
+
       redisClient.del(parsedData.data.email);
+
       res.status(500).json({
         message: "user creation failed",
       });
