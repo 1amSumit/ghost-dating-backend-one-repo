@@ -295,20 +295,20 @@ routes.post(
     } catch (err) {
       console.log(err);
 
-      try {
-        await prismaClient.user.delete({
-          where: {
-            id: parsedData.data.userId,
-          },
-        });
-      } catch (deleteError) {
-        console.error(
-          "Failed to delete user after creation error:",
-          deleteError
-        );
-      }
+      // try {
+      //   await prismaClient.user.delete({
+      //     where: {
+      //       id: parsedData.data.userId,
+      //     },
+      //   });
+      // } catch (deleteError) {
+      //   console.error(
+      //     "Failed to delete user after creation error:",
+      //     deleteError
+      //   );
+      // }
 
-      redisClient.del(parsedData.data.email);
+      // redisClient.del(parsedData.data.email);
 
       res.status(500).json({
         message: "user creation failed",
