@@ -40,6 +40,8 @@ routes.post("/signup", async (req, res) => {
       },
     }));
 
+  console.log(exists);
+
   if (exists !== null) {
     res.status(411).json({
       message: "already exists",
@@ -50,17 +52,23 @@ routes.post("/signup", async (req, res) => {
 
   const otp = generateOtp();
 
-  await redisClient.set(parsedData.data.email, otp, {
-    expiration: {
-      type: "EX",
-      value: 600,
-    },
-  });
-  await sendMail(parsedData.data.email, otp);
+  try {
+    await redisClient.set(parsedData.data.email, otp, {
+      expiration: {
+        type: "EX",
+        value: 600,
+      },
+    });
+    await sendMail(parsedData.data.email, otp);
 
-  res.status(200).json({
-    message: "otp sent successfully",
-  });
+    res.status(200).json({
+      message: "otp sent successfully",
+    });
+  } catch (err) {
+    res.status(501).json({
+      message: "server error",
+    });
+  }
 });
 
 routes.post("/verify-otp", async (req, res) => {
@@ -287,12 +295,15 @@ routes.post(
         }
       );
 
+      console.log("user created");
+
       res.status(200).json({
         token,
         user,
         message: "user created successfully",
       });
     } catch (err) {
+      console.log("error creating user");
       console.log(err);
 
       // try {

@@ -33,8 +33,6 @@ async function abhirajLike() {
     },
   });
 
-  console.log(abhiraj);
-
   const user = await prisma.user.findFirst({
     where: {
       email: "sj779619@gmail.com",

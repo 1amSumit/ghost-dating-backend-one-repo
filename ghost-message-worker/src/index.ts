@@ -33,8 +33,6 @@ async function main() {
             created_at: new Date(parsedData.created_at),
           },
         });
-        console.log(msg);
-        console.log("done");
       } catch (err) {
         console.log(err);
       }
